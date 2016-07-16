@@ -18,6 +18,9 @@ namespace MySqlDumpAnalyzer.Shared
             INSERT
         }
 
+        static byte[] Bytes(string str)
+            => str.ToCharArray().Select(c => (byte)c).ToArray();
+
         static readonly byte[] dropTerm = Bytes("DROP TABLE");
         static readonly byte[] createTerm = Bytes("CREATE TABLE");
         static readonly byte[] insertTerm = Bytes("INSERT INTO");
@@ -28,6 +31,8 @@ namespace MySqlDumpAnalyzer.Shared
             public long start;
             public long end;
         }
+        static FileRange Range(FileStream fs, long start, long end)
+            => new FileRange { fs = fs, start = start, end = end };
 
         class Statement
         {
@@ -53,11 +58,6 @@ namespace MySqlDumpAnalyzer.Shared
             public RangeTree Left { get; set; }
             public RangeTree Right { get; set; }
             public Statement FirstStatement { get; set; }
-        }
-
-        static FileRange Range(FileStream fs, long start, long end)
-        {
-            return new FileRange { fs = fs, start = start, end = end };
         }
 
         public static List<Table> AnalyseDumpFile(string filename)
@@ -254,11 +254,6 @@ namespace MySqlDumpAnalyzer.Shared
                 start: statementStart,
                 end: fs.Position
             );
-        }
-
-        static byte[] Bytes(string str)
-        {
-            return str.ToCharArray().Select(c => (byte)c).ToArray();
         }
 
     }
