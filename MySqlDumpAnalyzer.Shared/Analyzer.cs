@@ -11,7 +11,7 @@ namespace MySqlDumpAnalyzer.Shared
     public static class Analyser
     {
 
-        enum StatementType
+        public enum StatementType
         {
             DROPTABLE,
             CREATETABLE,
@@ -25,7 +25,7 @@ namespace MySqlDumpAnalyzer.Shared
         static readonly byte[] createTerm = Bytes("CREATE TABLE");
         static readonly byte[] insertTerm = Bytes("INSERT INTO");
 
-        struct FileRange
+        public struct FileRange
         {
             public FileStream fs;
             public long start;
@@ -34,7 +34,7 @@ namespace MySqlDumpAnalyzer.Shared
         static FileRange Range(FileStream fs, long start, long end)
             => new FileRange { fs = fs, start = start, end = end };
 
-        class Statement
+        public class Statement
         {
             public StatementType Type { get; }
             public string TableName { get; }
@@ -50,7 +50,7 @@ namespace MySqlDumpAnalyzer.Shared
             }
         }
 
-        class RangeTree
+        public class RangeTree
         {
             public long start;
             public long end;
@@ -60,28 +60,19 @@ namespace MySqlDumpAnalyzer.Shared
             public Statement FirstStatement { get; set; }
         }
 
-        public static List<Table> AnalyseDumpFile(string filename)
+        public static RangeTree AnalyseDumpFile(string filename)
         {
 
             using (var fs = File.OpenRead(filename)) {
-                var result = new List<Table>();
 
                 long filesize = fs.Seek(0L, SeekOrigin.End);
                 fs.Seek(0L, SeekOrigin.Begin);
 
-                var rtree = AnalyseRange(Range(fs, 0L, filesize));
-
-                Console.WriteLine();
-                PrintRangeTree(rtree);
-
-                // TODO: turn this into a list of tables
-
-
-                return result;
+                return AnalyseRange(Range(fs, 0L, filesize));
             }
         }
 
-        static void PrintRangeTree(RangeTree node, string indentation = "")
+        public static void PrintRangeTree(RangeTree node, string indentation = "")
         {
             if (node != null) {
                 var stmt = node.FirstStatement;
@@ -94,7 +85,7 @@ namespace MySqlDumpAnalyzer.Shared
 
         private static RangeTree AnalyseRange(FileRange range, Statement stmt1 = null)
         {
-            Console.Error.WriteLine("Analysing range ({0},{1})", range.start, range.end);
+            Debug.Print("Analysing range ({0},{1})", range.start, range.end);
             // 1. Find first statement of range: stmt1
             // 2. Bissect
             // 3. Find first statement from halfway through range: stmt2
@@ -109,7 +100,7 @@ namespace MySqlDumpAnalyzer.Shared
             if (stmt1 != null) {
 
                 var middle = stmt1.Start + (range.end - stmt1.Start) / 2L;
-                Console.Error.WriteLine("middle=" + middle);
+                Debug.Print("middle=" + middle);
 
                 var stmt2 = FindFirstStatement(Range(range.fs, start: middle, end: range.end));
                 if (stmt2 != null) {
@@ -121,8 +112,8 @@ namespace MySqlDumpAnalyzer.Shared
                     result.Left = AnalyseRange(Range(range.fs, stmt1.Start, middle), stmt1);
                 }
             }
-            //if (result.Left == null)
-            result.FirstStatement = stmt1;
+            if (result.Left == null)
+                result.FirstStatement = stmt1;
 
             // Tidy up tree a bit
             if (result.Left != null && result.Right == null && result.Left.FirstStatement == result.FirstStatement) {
@@ -181,12 +172,12 @@ namespace MySqlDumpAnalyzer.Shared
                     goto FoundTerm;
                 }
             }
-            Console.Error.WriteLine("Reached end of file");
+            Debug.Print("Reached end of file");
             return null;
         FoundTerm:
             long statementStart = fs.Position - term.Length;
             if (statementStart >= range.end) {
-                Console.Error.WriteLine("No Statements in Range ({0},{1})", range.start, range.end);
+                Debug.Print("No Statements in Range ({0},{1})", range.start, range.end);
                 return null;
             }
 
@@ -200,7 +191,7 @@ namespace MySqlDumpAnalyzer.Shared
                 tableName.Add((byte)c);
             }
             if (c == -1) {
-                Console.Error.WriteLine("Reached end of file before finding table name");
+                Debug.Print("Reached end of file before finding table name");
                 return null;
             }
 
@@ -233,13 +224,13 @@ namespace MySqlDumpAnalyzer.Shared
                 }
             }
             if (c == -1) {
-                Console.Error.WriteLine("Reached end of file before end of statement");
+                Debug.Print("Reached end of file before end of statement");
                 return null;
             }
 
             {
                 var termString = new string(term.Select(b => (char)b).ToArray());
-                Console.Error.WriteLine("Found " + termString + " statement for " + tableNameStr + " at " + statementStart);
+                Debug.Print("Found " + termString + " statement for " + tableNameStr + " at " + statementStart);
             }
 
             StatementType stType =
