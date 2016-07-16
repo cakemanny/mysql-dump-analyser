@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MySqlDumpAnalyzer.Shared;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,7 @@ namespace MySqlDumpAnalyzer.CLI
     {
         static void Main(string[] args)
         {
+            Analyser.AnalyseDumpFile(args[0]);
         }
     }
 }
