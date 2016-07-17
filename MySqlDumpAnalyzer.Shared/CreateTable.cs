@@ -2,7 +2,7 @@
 {
     public class CreateTable
     {
-        ulong start;
-        ulong end;
+        public long Start { get; set; }
+        public long End { get; set; }
     }
 }

@@ -62,13 +62,21 @@ namespace MySqlDumpAnalyzer.Shared
 
         public static RangeTree AnalyseDumpFile(string filename)
         {
-
             using (var fs = File.OpenRead(filename)) {
 
                 long filesize = fs.Seek(0L, SeekOrigin.End);
                 fs.Seek(0L, SeekOrigin.Begin);
 
                 return AnalyseRange(Range(fs, 0L, filesize));
+            }
+        }
+
+        internal static void VisitTree(RangeTree node, Action<RangeTree> visitor)
+        {
+            if (node != null) {
+                visitor(node);
+                VisitTree(node.Left, visitor);
+                VisitTree(node.Right, visitor);
             }
         }
 

@@ -22,6 +22,14 @@ namespace MySqlDumpAnalyzer.CLI
 
             var tree = Analyser.AnalyseDumpFile(args[0]);
             Analyser.PrintRangeTree(tree);
+
+            Console.WriteLine();
+
+            var tables = Table.GetTableList(tree);
+            tables.ForEach(t => {
+                Console.WriteLine($"{t.Name}: {t.Start} - {t.End}");
+            });
+
             return 0;
         }
     }

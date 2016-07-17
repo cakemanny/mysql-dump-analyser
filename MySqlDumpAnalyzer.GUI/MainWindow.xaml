@@ -1,0 +1,64 @@
+﻿<Window x:Class="MySqlDumpAnalyzer.GUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MySqlDumpAnalyzer.GUI"
+        mc:Ignorable="d"
+        Title="MySQL Dump Analyser" Height="350" Width="525">
+    <Window.CommandBindings>
+        <CommandBinding Command="Open" CanExecute="OpenCommand_CanExecute" Executed="OpenCommand_Executed"/>
+    </Window.CommandBindings>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="Open..." Command="Open"/>
+                <Separator/>
+                <MenuItem Header="E_xit" Command="Close"/>
+            </MenuItem>
+            <MenuItem Header="E_xport">
+                <MenuItem Header="Export _Selection..."/>
+            </MenuItem>
+        </Menu>
+        <Grid>
+            <ListView Margin="10" Name="lvTables" Grid.RowSpan="2">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Object Type" DisplayMemberBinding="{Binding Type}"/>
+                        <GridViewColumn Header="Object Name" DisplayMemberBinding="{Binding Name}"/>
+                        <GridViewColumn Header="Start Position" DisplayMemberBinding="{Binding Start}"/>
+                        <GridViewColumn Header="End Position" DisplayMemberBinding="{Binding End}"/>
+                        <GridViewColumn Header="Definitions">
+                            <GridViewColumn.HeaderTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <CheckBox VerticalAlignment="Center"/>
+                                        <Label>
+                                            <Binding/>
+                                        </Label>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </GridViewColumn.HeaderTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Data">
+                            <GridViewColumn.HeaderTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <CheckBox VerticalAlignment="Center"/>
+                                        <Label>
+                                            <Binding/>
+                                        </Label>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </GridViewColumn.HeaderTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+            <Grid Background="White" Visibility="Hidden" Name="grLoading">
+                <!-- TODO: Spinner -->
+                <Label HorizontalAlignment="Center" VerticalAlignment="Center" Grid.RowSpan="2">Loading...</Label>
+            </Grid>
+        </Grid>
+    </DockPanel>
+</Window>
