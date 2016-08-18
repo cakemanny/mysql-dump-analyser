@@ -1,0 +1,4 @@
+#!/bin/bash
+
+for DEF in Definitions/*.sql; do
+    mysql -umysqldumpanalyser -pmysqldumpanalyser
