@@ -1,4 +1,24 @@
 #!/bin/bash
 
+tmp=`mktemp`
+echo -e "[client]\nuser = mydumpanalyser\npassword = mydumpanalyser" > $tmp
+MYSQL="mysql --defaults-extra-file=$tmp"
+MYDUMP="mysqldump --defaults-extra-file=$tmp"
+
 for DEF in Definitions/*.sql; do
-    mysql -umysqldumpanalyser -pmysqldumpanalyser
+    {
+        echo "set @@session.foreign_key_checks = 0;"
+        $MYSQL -N mysqldumpanalyser -e"
+            select concat('DROP ', IF (TABLE_TYPE like '%TABLE%', 'TABLE', TABLE_TYPE) ,' mysqldumpanalyser.',table_name,';')
+              from information_schema.TABLES t
+             where TABLE_SCHEMA='mysqldumpanalyser'
+        "
+        echo "set @@session.foreign_key_checks = 1;"
+        cat $DEF
+    } | $MYSQL mysqldumpanalyser
+    OUT=Dumps/$(basename $DEF)
+    $MYDUMP -r $OUT mysqldumpanalyser
+done
+
+rm $tmp
+

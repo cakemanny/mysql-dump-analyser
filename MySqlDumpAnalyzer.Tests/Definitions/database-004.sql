@@ -1,6 +1,6 @@
 
 CREATE TABLE table1 (x int);
-CREATE TABLE table2 (x int);
+CREATE VIEW view1 AS SELECT x FROM table1;
 
 INSERT INTO table1
 SELECT x1.x + 10 * x2.x FROM
