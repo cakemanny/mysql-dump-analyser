@@ -32,25 +32,43 @@
                             <GridViewColumn.HeaderTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-                                        <CheckBox VerticalAlignment="Center"/>
+                                        <CheckBox VerticalAlignment="Center" Name="cbExportDefsAll"
+                                                  Checked="cbExportDefsAll_CheckedChanged" Unchecked="cbExportDefsAll_CheckedChanged"
+                                                  Initialized="cbExportDefsAll_Initialized"/>
                                         <Label>
                                             <Binding/>
                                         </Label>
                                     </StackPanel>
                                 </DataTemplate>
                             </GridViewColumn.HeaderTemplate>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center"
+                                              IsChecked="{Binding ExportDefinitions}"
+                                              Checked="cbExportDefs_CheckedChanged" Unchecked="cbExportDefs_CheckedChanged"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
                         </GridViewColumn>
                         <GridViewColumn Header="Data">
                             <GridViewColumn.HeaderTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-                                        <CheckBox VerticalAlignment="Center"/>
+                                        <CheckBox VerticalAlignment="Center" Name="cbExportDataAll"
+                                                  Checked="cbExportDataAll_CheckedChanged" Unchecked="cbExportDataAll_CheckedChanged"
+                                                  Initialized="cbExportDataAll_Initialized"/>
                                         <Label>
                                             <Binding/>
                                         </Label>
                                     </StackPanel>
                                 </DataTemplate>
                             </GridViewColumn.HeaderTemplate>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center"
+                                              IsChecked="{Binding ExportData}"
+                                              Checked="cbExportData_CheckedChanged" Unchecked="cbExportData_CheckedChanged"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
                         </GridViewColumn>
                     </GridView>
                 </ListView.View>

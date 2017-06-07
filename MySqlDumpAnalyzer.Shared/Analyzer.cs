@@ -71,6 +71,20 @@ namespace MySqlDumpAnalyzer.Shared
             }
         }
 
+        public static void AnalyseDumpFileToList(string filename)
+        {
+            using (var fs = File.OpenRead(filename)) {
+                long filesize = fs.Seek(0L, SeekOrigin.End);
+                fs.Seek(0L, SeekOrigin.Begin);
+
+
+                var foundStatements = new LinkedList<Statement>();
+
+                foundStatements.AddFirst(FindFirstStatement(Range(fs, 0, filesize)));
+
+            }
+        }
+
         internal static void VisitTree(RangeTree node, Action<RangeTree> visitor)
         {
             if (node != null) {
@@ -141,6 +155,17 @@ namespace MySqlDumpAnalyzer.Shared
             return result;
         }
 #endif
+
+        private static List<Statement> FindAllStatements(FileRange range)
+        {
+            var results = new List<Statement>();
+            var previous = FindFirstStatement(range);
+            while (previous != null) {
+                results.Add(previous);
+                previous = FindFirstStatement(Range(fs: range.fs, start: previous.End, end: range.end));
+            }
+            return results;
+        }
 
         private static Statement FindFirstStatement(FileRange range)
         {

@@ -15,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using MySqlDumpAnalyzer.Shared;
+using System.Diagnostics;
 
 namespace MySqlDumpAnalyzer.GUI
 {
@@ -23,12 +24,18 @@ namespace MySqlDumpAnalyzer.GUI
     /// </summary>
     public partial class MainWindow : Window
     {
-
+        // Modelly stuff
         private string dumpFilePath;
         private readonly BackgroundWorker worker = new BackgroundWorker();
         private Analyser.RangeTree tree;
-        private List<Shared.Table> tables;
-        private List<FileSection> sections;
+        private List<Shared.Table> tables = new List<Shared.Table>();
+        private List<FileSection> sections = new List<FileSection>();
+
+        // Elements from our GUI which we can't access because they are in templates
+        // (but really there is only one of)
+        private CheckBox cbExportDefsAll;
+        private CheckBox cbExportDataAll;
+
 
         class FileSection
         {
@@ -36,6 +43,8 @@ namespace MySqlDumpAnalyzer.GUI
             public string Type { get; set; }
             public long Start { get; set; }
             public long End { get; set; }
+            public bool ExportDefinitions { get; set; }
+            public bool ExportData { get; set; }
         }
 
         public MainWindow()
@@ -54,7 +63,9 @@ namespace MySqlDumpAnalyzer.GUI
                 Name = t.Name,
                 Type = "Table",
                 Start = t.Start,
-                End = t.End
+                End = t.End,
+                ExportDefinitions = true,
+                ExportData = true
             }).ToList();
             lvTables.ItemsSource = sections;
         }
@@ -84,5 +95,73 @@ namespace MySqlDumpAnalyzer.GUI
                 grLoading.Visibility = Visibility.Visible;
             }
         }
+
+        // Handlers for Export Definitions Checkboxes
+
+        private void cbExportDefsAll_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            bool newValue = ((CheckBox)sender).IsChecked ?? false;
+            sections.ForEach(s => s.ExportDefinitions = newValue);
+            lvTables.Items.Refresh();
+        }
+
+        private void cbExportDefs_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            bool newValue = ((CheckBox)sender).IsChecked ?? false;
+            FileSection section = (FileSection)((CheckBox)sender).DataContext;
+            section.ExportDefinitions = newValue;
+            if (sections.All(s => s.ExportDefinitions))
+            {
+                cbExportDefsAll.IsChecked = true;
+            }
+            else if (sections.All(s => !s.ExportDefinitions))
+            {
+                cbExportDefsAll.IsChecked = false;
+            }
+            else
+            {
+                cbExportDefsAll.IsChecked = null;
+            }
+        }
+
+        private void cbExportDefsAll_Initialized(object sender, EventArgs e)
+        {
+            cbExportDefsAll = (CheckBox)sender;
+        }
+
+
+        // Handlers for Exports Data Checkboxes
+
+        private void cbExportDataAll_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            bool newValue = ((CheckBox)sender).IsChecked ?? false;
+            sections.ForEach(s => s.ExportData = newValue);
+            lvTables.Items.Refresh();
+        }
+
+        private void cbExportData_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            bool newValue = ((CheckBox)sender).IsChecked ?? false;
+            FileSection section = (FileSection)((CheckBox)sender).DataContext;
+            section.ExportData = newValue;
+            if (sections.All(s => s.ExportData))
+            {
+                cbExportDataAll.IsChecked = true;
+            }
+            else if (sections.All(s => !s.ExportData))
+            {
+                cbExportDataAll.IsChecked = false;
+            }
+            else
+            {
+                cbExportDataAll.IsChecked = null;
+            }
+        }
+
+        private void cbExportDataAll_Initialized(object sender, EventArgs e)
+        {
+            cbExportDataAll = (CheckBox)sender; 
+        }
+
     }
 }

@@ -22,7 +22,7 @@ namespace MySqlDumpAnalyzer.Shared
         {
             var tables = new List<Table>();
 
-            Analyser.VisitTree(tree, node => {
+            VisitTree(tree, node => {
                 if (node.FirstStatement != null && node.FirstStatement.Type == StatementType.DROPTABLE) {
                     var stmt = node.FirstStatement;
 
